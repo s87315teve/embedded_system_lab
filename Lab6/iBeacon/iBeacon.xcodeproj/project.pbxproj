@@ -1,0 +1,608 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		C834D4B52BCE6B39009D897D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C834D4B42BCE6B39009D897D /* AppDelegate.swift */; };
+		C834D4B72BCE6B39009D897D /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C834D4B62BCE6B39009D897D /* SceneDelegate.swift */; };
+		C834D4B92BCE6B39009D897D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C834D4B82BCE6B39009D897D /* ViewController.swift */; };
+		C834D4BC2BCE6B39009D897D /* Base in Resources */ = {isa = PBXBuildFile; fileRef = C834D4BB2BCE6B39009D897D /* Base */; };
+		C834D4BE2BCE6B3A009D897D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C834D4BD2BCE6B3A009D897D /* Assets.xcassets */; };
+		C834D4C12BCE6B3A009D897D /* Base in Resources */ = {isa = PBXBuildFile; fileRef = C834D4C02BCE6B3A009D897D /* Base */; };
+		C834D4CC2BCE6B3A009D897D /* iBeaconTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C834D4CB2BCE6B3A009D897D /* iBeaconTests.swift */; };
+		C834D4D62BCE6B3A009D897D /* iBeaconUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C834D4D52BCE6B3A009D897D /* iBeaconUITests.swift */; };
+		C834D4D82BCE6B3A009D897D /* iBeaconUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C834D4D72BCE6B3A009D897D /* iBeaconUITestsLaunchTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C834D4C82BCE6B3A009D897D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C834D4A92BCE6B39009D897D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C834D4B02BCE6B39009D897D;
+			remoteInfo = iBeacon;
+		};
+		C834D4D22BCE6B3A009D897D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C834D4A92BCE6B39009D897D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C834D4B02BCE6B39009D897D;
+			remoteInfo = iBeacon;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		C834D4B12BCE6B39009D897D /* iBeacon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iBeacon.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C834D4B42BCE6B39009D897D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		C834D4B62BCE6B39009D897D /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		C834D4B82BCE6B39009D897D /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		C834D4BB2BCE6B39009D897D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		C834D4BD2BCE6B3A009D897D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C834D4C02BCE6B3A009D897D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		C834D4C22BCE6B3A009D897D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C834D4C72BCE6B3A009D897D /* iBeaconTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iBeaconTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C834D4CB2BCE6B3A009D897D /* iBeaconTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iBeaconTests.swift; sourceTree = "<group>"; };
+		C834D4D12BCE6B3A009D897D /* iBeaconUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iBeaconUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C834D4D52BCE6B3A009D897D /* iBeaconUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iBeaconUITests.swift; sourceTree = "<group>"; };
+		C834D4D72BCE6B3A009D897D /* iBeaconUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iBeaconUITestsLaunchTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C834D4AE2BCE6B39009D897D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C834D4C42BCE6B3A009D897D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C834D4CE2BCE6B3A009D897D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		C834D4A82BCE6B39009D897D = {
+			isa = PBXGroup;
+			children = (
+				C834D4B32BCE6B39009D897D /* iBeacon */,
+				C834D4CA2BCE6B3A009D897D /* iBeaconTests */,
+				C834D4D42BCE6B3A009D897D /* iBeaconUITests */,
+				C834D4B22BCE6B39009D897D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		C834D4B22BCE6B39009D897D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C834D4B12BCE6B39009D897D /* iBeacon.app */,
+				C834D4C72BCE6B3A009D897D /* iBeaconTests.xctest */,
+				C834D4D12BCE6B3A009D897D /* iBeaconUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C834D4B32BCE6B39009D897D /* iBeacon */ = {
+			isa = PBXGroup;
+			children = (
+				C834D4B42BCE6B39009D897D /* AppDelegate.swift */,
+				C834D4B62BCE6B39009D897D /* SceneDelegate.swift */,
+				C834D4B82BCE6B39009D897D /* ViewController.swift */,
+				C834D4BA2BCE6B39009D897D /* Main.storyboard */,
+				C834D4BD2BCE6B3A009D897D /* Assets.xcassets */,
+				C834D4BF2BCE6B3A009D897D /* LaunchScreen.storyboard */,
+				C834D4C22BCE6B3A009D897D /* Info.plist */,
+			);
+			path = iBeacon;
+			sourceTree = "<group>";
+		};
+		C834D4CA2BCE6B3A009D897D /* iBeaconTests */ = {
+			isa = PBXGroup;
+			children = (
+				C834D4CB2BCE6B3A009D897D /* iBeaconTests.swift */,
+			);
+			path = iBeaconTests;
+			sourceTree = "<group>";
+		};
+		C834D4D42BCE6B3A009D897D /* iBeaconUITests */ = {
+			isa = PBXGroup;
+			children = (
+				C834D4D52BCE6B3A009D897D /* iBeaconUITests.swift */,
+				C834D4D72BCE6B3A009D897D /* iBeaconUITestsLaunchTests.swift */,
+			);
+			path = iBeaconUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C834D4B02BCE6B39009D897D /* iBeacon */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C834D4DB2BCE6B3A009D897D /* Build configuration list for PBXNativeTarget "iBeacon" */;
+			buildPhases = (
+				C834D4AD2BCE6B39009D897D /* Sources */,
+				C834D4AE2BCE6B39009D897D /* Frameworks */,
+				C834D4AF2BCE6B39009D897D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = iBeacon;
+			productName = iBeacon;
+			productReference = C834D4B12BCE6B39009D897D /* iBeacon.app */;
+			productType = "com.apple.product-type.application";
+		};
+		C834D4C62BCE6B3A009D897D /* iBeaconTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C834D4DE2BCE6B3A009D897D /* Build configuration list for PBXNativeTarget "iBeaconTests" */;
+			buildPhases = (
+				C834D4C32BCE6B3A009D897D /* Sources */,
+				C834D4C42BCE6B3A009D897D /* Frameworks */,
+				C834D4C52BCE6B3A009D897D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C834D4C92BCE6B3A009D897D /* PBXTargetDependency */,
+			);
+			name = iBeaconTests;
+			productName = iBeaconTests;
+			productReference = C834D4C72BCE6B3A009D897D /* iBeaconTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		C834D4D02BCE6B3A009D897D /* iBeaconUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C834D4E12BCE6B3A009D897D /* Build configuration list for PBXNativeTarget "iBeaconUITests" */;
+			buildPhases = (
+				C834D4CD2BCE6B3A009D897D /* Sources */,
+				C834D4CE2BCE6B3A009D897D /* Frameworks */,
+				C834D4CF2BCE6B3A009D897D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C834D4D32BCE6B3A009D897D /* PBXTargetDependency */,
+			);
+			name = iBeaconUITests;
+			productName = iBeaconUITests;
+			productReference = C834D4D12BCE6B3A009D897D /* iBeaconUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C834D4A92BCE6B39009D897D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1530;
+				LastUpgradeCheck = 1530;
+				TargetAttributes = {
+					C834D4B02BCE6B39009D897D = {
+						CreatedOnToolsVersion = 15.3;
+					};
+					C834D4C62BCE6B3A009D897D = {
+						CreatedOnToolsVersion = 15.3;
+						TestTargetID = C834D4B02BCE6B39009D897D;
+					};
+					C834D4D02BCE6B3A009D897D = {
+						CreatedOnToolsVersion = 15.3;
+						TestTargetID = C834D4B02BCE6B39009D897D;
+					};
+				};
+			};
+			buildConfigurationList = C834D4AC2BCE6B39009D897D /* Build configuration list for PBXProject "iBeacon" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = C834D4A82BCE6B39009D897D;
+			productRefGroup = C834D4B22BCE6B39009D897D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C834D4B02BCE6B39009D897D /* iBeacon */,
+				C834D4C62BCE6B3A009D897D /* iBeaconTests */,
+				C834D4D02BCE6B3A009D897D /* iBeaconUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		C834D4AF2BCE6B39009D897D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C834D4BE2BCE6B3A009D897D /* Assets.xcassets in Resources */,
+				C834D4C12BCE6B3A009D897D /* Base in Resources */,
+				C834D4BC2BCE6B39009D897D /* Base in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C834D4C52BCE6B3A009D897D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C834D4CF2BCE6B3A009D897D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C834D4AD2BCE6B39009D897D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C834D4B92BCE6B39009D897D /* ViewController.swift in Sources */,
+				C834D4B52BCE6B39009D897D /* AppDelegate.swift in Sources */,
+				C834D4B72BCE6B39009D897D /* SceneDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C834D4C32BCE6B3A009D897D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C834D4CC2BCE6B3A009D897D /* iBeaconTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C834D4CD2BCE6B3A009D897D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C834D4D82BCE6B3A009D897D /* iBeaconUITestsLaunchTests.swift in Sources */,
+				C834D4D62BCE6B3A009D897D /* iBeaconUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C834D4C92BCE6B3A009D897D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C834D4B02BCE6B39009D897D /* iBeacon */;
+			targetProxy = C834D4C82BCE6B3A009D897D /* PBXContainerItemProxy */;
+		};
+		C834D4D32BCE6B3A009D897D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C834D4B02BCE6B39009D897D /* iBeacon */;
+			targetProxy = C834D4D22BCE6B3A009D897D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		C834D4BA2BCE6B39009D897D /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C834D4BB2BCE6B39009D897D /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		C834D4BF2BCE6B3A009D897D /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C834D4C02BCE6B3A009D897D /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		C834D4D92BCE6B3A009D897D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		C834D4DA2BCE6B3A009D897D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		C834D4DC2BCE6B3A009D897D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3G42LQJ6UL;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = iBeacon/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nycu.esd.409504010.iBeacon;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C834D4DD2BCE6B3A009D897D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3G42LQJ6UL;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = iBeacon/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nycu.esd.409504010.iBeacon;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		C834D4DF2BCE6B3A009D897D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nycu.esd.409504010.iBeaconTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/iBeacon.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/iBeacon";
+			};
+			name = Debug;
+		};
+		C834D4E02BCE6B3A009D897D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nycu.esd.409504010.iBeaconTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/iBeacon.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/iBeacon";
+			};
+			name = Release;
+		};
+		C834D4E22BCE6B3A009D897D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nycu.esd.409504010.iBeaconUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = iBeacon;
+			};
+			name = Debug;
+		};
+		C834D4E32BCE6B3A009D897D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = nycu.esd.409504010.iBeaconUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = iBeacon;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C834D4AC2BCE6B39009D897D /* Build configuration list for PBXProject "iBeacon" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C834D4D92BCE6B3A009D897D /* Debug */,
+				C834D4DA2BCE6B3A009D897D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C834D4DB2BCE6B3A009D897D /* Build configuration list for PBXNativeTarget "iBeacon" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C834D4DC2BCE6B3A009D897D /* Debug */,
+				C834D4DD2BCE6B3A009D897D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C834D4DE2BCE6B3A009D897D /* Build configuration list for PBXNativeTarget "iBeaconTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C834D4DF2BCE6B3A009D897D /* Debug */,
+				C834D4E02BCE6B3A009D897D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C834D4E12BCE6B3A009D897D /* Build configuration list for PBXNativeTarget "iBeaconUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C834D4E22BCE6B3A009D897D /* Debug */,
+				C834D4E32BCE6B3A009D897D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = C834D4A92BCE6B39009D897D /* Project object */;
+}
