@@ -9,6 +9,8 @@ import UIKit
 
 class ViewController: UIViewController, StreamDelegate {
 
+    @IBOutlet weak var connectButton: UIButton!
+    @IBOutlet weak var hostIPTextfield: UITextField!
     @IBOutlet weak var resetButton: UIButton!
     @IBOutlet weak var serverMsgLabel: UILabel!
     @IBOutlet weak var statusLabel: UILabel!
@@ -20,19 +22,27 @@ class ViewController: UIViewController, StreamDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        setupNetworkCommunication()
+//        let hostIP=hostIPTextfield.text!
+//        setupNetworkCommunication(hostIP: hostIP)
     }
     
+    @IBAction func connectButtonPressed(_ sender: Any) {
+        let hostIP=hostIPTextfield.text!
+        setupNetworkCommunication(hostIP: hostIP)
+        statusLabel.text="connect to server: \(hostIP)"
+        
+    }
     @IBAction func resetButtonPressed(_ sender: Any) {
-        setupNetworkCommunication()
+        let hostIP=hostIPTextfield.text!
+        setupNetworkCommunication(hostIP: hostIP)
         statusLabel.text="reset finished"
     }
-    func setupNetworkCommunication() {
+    func setupNetworkCommunication(hostIP: String) {
             var readStream: Unmanaged<CFReadStream>?
             var writeStream: Unmanaged<CFWriteStream>?
             
             // 替換"your.server.ip"和1234為你的服務器IP地址和端口
-            CFStreamCreatePairWithSocketToHost(nil, "172.18.20.92" as CFString, 6000, &readStream, &writeStream)
+            CFStreamCreatePairWithSocketToHost(nil, hostIP as CFString, 6000, &readStream, &writeStream)
             
             inputStream = readStream?.takeRetainedValue()
             outputStream = writeStream?.takeRetainedValue()
