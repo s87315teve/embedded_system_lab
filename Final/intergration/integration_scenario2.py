@@ -9,29 +9,396 @@ import traceback
 import argparse
 import json
 import numpy as np
+import sympy as sp
+import copy
 
 json_list = {i: [] for i in range(1, 9)}
+json_list_length_limit=10
+time_limit=20
+start_time=time.time()
 
 
-def check_and_average_minors(json_list):
+def fill_json_list(json_list, limit_length=json_list_length_limit):
+    json_list_copy = copy.deepcopy(json_list)
+    for key, items in json_list_copy.items():
+        if len(items) < limit_length:
+            # Calculate the average RSSI value from existing items
+            if items:  # Check if there are any existing items to calculate the average
+                average_rssi = sum(item['RSSI'] for item in items) / len(items)
+            else:
+                average_rssi = -1000  # Set RSSI to -200 if no initial values
+            
+            # Add additional items to fill the list to 10 items
+            while len(items) < limit_length:
+                items.append({'Major': 2, 'Minor': key, 'RSSI': average_rssi})
+
+    return json_list_copy
+
+def get_input(json_list):
+    # Initialize the list to store average RSSI values
+    average_rssi = []
+    # Calculate the average RSSI for each minor or fill with -1000 if the minor key does not exist
+    for minor_value in range(1, 9):
+        if json_list[minor_value]:
+            rssi_values = [item['RSSI'] for item in json_list[minor_value]]
+            average_rssi.append(np.mean(rssi_values))
+        else:
+            average_rssi.append(-1000)
+    return average_rssi
+
+class ParticleFilter:
+    def __init__(self, num_particles=1000):
+        self.num_particles = num_particles
+        self.particles = None
+        self.weights = None
+        self.beacons = None
+        self.x_min = None
+        self.y_min = None
+        self.x_max = None
+        self.y_max = None
+
+    def initialize_particles(self):
+        if self.beacons is None:
+            raise ValueError("Beacons must be set before initializing particles.")
+        self.x_min, self.y_min = np.min(self.beacons, axis=0) - 1
+        self.x_max, self.y_max = np.max(self.beacons, axis=0) + 1
+        particles = np.empty((self.num_particles, 2))
+        particles[:, 0] = np.random.uniform(self.x_min, self.x_max, self.num_particles)
+        particles[:, 1] = np.random.uniform(self.y_min, self.y_max, self.num_particles)
+        self.particles = particles
+        self.weights = np.ones(self.num_particles) / self.num_particles
+
+    @staticmethod
+    def rssi_to_distance(rssi):
+        tx_power = -59  # dBm (example value for 1 meter distance)
+        n = 2.4  # Path loss exponent (example value for free space)
+        distance = 10 ** ((tx_power - np.array(rssi)) / (10 * n))
+        return distance
+
+    @staticmethod
+    def distance_to_rssi(distance):
+        tx_power = -59  # dBm (example value for 1 meter distance)
+        n = 2.4  # Path loss exponent (example value for free space)
+        rssi = tx_power - 10 * n * np.log10(distance)
+        return rssi
+
+    def set_beacons(self, beacons):
+        self.beacons = np.array(beacons)
+        self.initialize_particles()
+
+    def predict(self):
+        # In this example, we assume no movement, so particles remain the same
+        self.particles = np.clip(self.particles, [self.x_min, self.y_min], [self.x_max, self.y_max])
+        return self.particles
+
+    def update(self, distances):
+        if self.particles is None:
+            raise ValueError("Particles must be initialized before updating.")
+        self.weights.fill(1.0)
+        for i, beacon in enumerate(self.beacons):
+            beacon_dist = np.linalg.norm(self.particles - beacon, axis=1)
+            self.weights *= np.exp(-0.5 * ((beacon_dist - distances[i]) ** 2))
+        self.weights += 1e-300  # to avoid division by zero
+        self.weights /= np.sum(self.weights)  # normalize
+
+    def resample(self):
+        indices = np.random.choice(np.arange(self.num_particles), size=self.num_particles, p=self.weights)
+        self.particles = self.particles[indices]
+        self.weights = self.weights[indices]
+        self.weights /= np.sum(self.weights)
+
+    def run(self, rssi_values, iterations=100):
+        if self.beacons is None:
+            raise ValueError("Beacons must be set before running the filter.")
+        distances = self.rssi_to_distance(rssi_values)
+        for _ in range(iterations):
+            self.particles = self.predict()
+            self.update(distances)
+            self.resample()
+
+        # Estimate the device location as the mean of the particles
+        estimated_location = np.mean(self.particles, axis=0)
+        return estimated_location
+
+class Triangulation:
+    @staticmethod
+    def rssi_to_distance(rssi):
+        tx_power = -59  # dBm (example value for 1 meter distance)
+        n = 2.4  # Path loss exponent (example value for free space)
+        distance = 10 ** ((tx_power - np.array(rssi)) / (10 * n))
+        return distance
+
+    @staticmethod
+    def distance_to_rssi(distance):
+        tx_power = -59  # dBm (example value for 1 meter distance)
+        n = 2.4 # Path loss exponent (example value for free space)
+        rssi = tx_power - 10 * n * np.log10(distance)
+        return rssi
+
+    def compute_dist(self, beacons, rssi_values):
+        distances = self.rssi_to_distance(rssi_values)
+        coords_and_dists = []
+        for i, beacon in enumerate(beacons):
+            coords_and_dists.append((beacon[0], beacon[1], distances[i]))
+        return coords_and_dists
+
+    def triposition(self, beacons, rssi_values):
+        coords_and_dists = self.compute_dist(beacons, rssi_values)
+        (xa, ya, da), (xb, yb, db), (xc, yc, dc) = coords_and_dists[:3]
+        x, y = sp.symbols('x y')
+        f1 = 2*x*(xa-xc) + xc**2 - xa**2 + 2*y*(ya-yc) + yc**2 - ya**2 - (dc**2 - da**2)
+        f2 = 2*x*(xb-xc) + xc**2 - xb**2 + 2*y*(yb-yc) + yc**2 - yb**2 - (dc**2 - db**2)
+        result = sp.solve([f1, f2], (x, y))
+        locx, locy = result[x], result[y]
+        return [float(locx), float(locy)]
+
+def detect_location(rssi_values, beacons, mode="pf"):
+    if mode == "pf":
+        # Get the indices of the two-largest RSSI values
+        largest_indices = np.argsort(rssi_values)[-3:]
+        largest_beacons = [beacons[i] for i in largest_indices]
+        largest_rssi_values = [rssi_values[i] for i in largest_indices]
+
+        # Create and configure the particle filter
+        pf = ParticleFilter()
+        pf.set_beacons(largest_beacons)
+
+        # Run the particle filter
+        estimated_location = pf.run(largest_rssi_values)
+    elif mode == "tri":
+        # Use triangulation to locate the device
+        tri = Triangulation()
+        estimated_location = tri.triposition(beacons, rssi_values)
+    else:
+        raise ValueError("Unsupported mode. Use 'pf' for particle filter or 'tri' for triangulation.")
+
+    return estimated_location
+
+def clip_location(loc):
+    y_min, y_max = 0, 0
+    if loc[0] < 0:
+        x = 0
+    elif loc[0] > 0 and loc[0] < 14.0:
+        y_max = 2.67 
+        x = loc[0]
+    elif loc[0] > 14.0 and loc[0] < 18.1:
+        y_max = 3.9
+        x = loc[0]
+    elif loc[0] > 18.1:
+        x = 18.1
+    
+    if loc[1] < y_min:
+        y = y_max/2
+    elif loc[1] > y_max:
+        y = y_max/2
+    else:
+        y = loc[1]
+    
+    return [x,y]
+
+def get_input(json_list):
+    # Initialize the list to store average RSSI values
+    average_rssi = []
+    # Calculate the average RSSI for each minor or fill with -1000 if the minor key does not exist
+    for minor_value in range(1, 9):
+        if json_list[minor_value]:
+            rssi_values = [item['RSSI'] for item in json_list[minor_value]]
+            average_rssi.append(np.mean(rssi_values))
+        else:
+            average_rssi.append(-1000)
+    return average_rssi
+
+class ParticleFilter:
+    def __init__(self, num_particles=1000):
+        self.num_particles = num_particles
+        self.particles = None
+        self.weights = None
+        self.beacons = None
+        self.x_min = None
+        self.y_min = None
+        self.x_max = None
+        self.y_max = None
+
+    def initialize_particles(self):
+        if self.beacons is None:
+            raise ValueError("Beacons must be set before initializing particles.")
+        self.x_min, self.y_min = np.min(self.beacons, axis=0) - 1
+        self.x_max, self.y_max = np.max(self.beacons, axis=0) + 1
+        particles = np.empty((self.num_particles, 2))
+        particles[:, 0] = np.random.uniform(self.x_min, self.x_max, self.num_particles)
+        particles[:, 1] = np.random.uniform(self.y_min, self.y_max, self.num_particles)
+        self.particles = particles
+        self.weights = np.ones(self.num_particles) / self.num_particles
+
+    @staticmethod
+    def rssi_to_distance(rssi):
+        tx_power = -59  # dBm (example value for 1 meter distance)
+        n = 2.4  # Path loss exponent (example value for free space)
+        distance = 10 ** ((tx_power - np.array(rssi)) / (10 * n))
+        return distance
+
+    @staticmethod
+    def distance_to_rssi(distance):
+        tx_power = -59  # dBm (example value for 1 meter distance)
+        n = 2.4  # Path loss exponent (example value for free space)
+        rssi = tx_power - 10 * n * np.log10(distance)
+        return rssi
+
+    def set_beacons(self, beacons):
+        self.beacons = np.array(beacons)
+        self.initialize_particles()
+
+    def predict(self):
+        # In this example, we assume no movement, so particles remain the same
+        self.particles = np.clip(self.particles, [self.x_min, self.y_min], [self.x_max, self.y_max])
+        return self.particles
+
+    def update(self, distances):
+        if self.particles is None:
+            raise ValueError("Particles must be initialized before updating.")
+        self.weights.fill(1.0)
+        for i, beacon in enumerate(self.beacons):
+            beacon_dist = np.linalg.norm(self.particles - beacon, axis=1)
+            self.weights *= np.exp(-0.5 * ((beacon_dist - distances[i]) ** 2))
+        self.weights += 1e-300  # to avoid division by zero
+        self.weights /= np.sum(self.weights)  # normalize
+
+    def resample(self):
+        indices = np.random.choice(np.arange(self.num_particles), size=self.num_particles, p=self.weights)
+        self.particles = self.particles[indices]
+        self.weights = self.weights[indices]
+        self.weights /= np.sum(self.weights)
+
+    def run(self, rssi_values, iterations=100):
+        if self.beacons is None:
+            raise ValueError("Beacons must be set before running the filter.")
+        distances = self.rssi_to_distance(rssi_values)
+        for _ in range(iterations):
+            self.particles = self.predict()
+            self.update(distances)
+            self.resample()
+
+        # Estimate the device location as the mean of the particles
+        estimated_location = np.mean(self.particles, axis=0)
+        return estimated_location
+
+class Triangulation:
+    @staticmethod
+    def rssi_to_distance(rssi):
+        tx_power = -59  # dBm (example value for 1 meter distance)
+        n = 2.4  # Path loss exponent (example value for free space)
+        distance = 10 ** ((tx_power - np.array(rssi)) / (10 * n))
+        return distance
+
+    @staticmethod
+    def distance_to_rssi(distance):
+        tx_power = -59  # dBm (example value for 1 meter distance)
+        n = 2.4 # Path loss exponent (example value for free space)
+        rssi = tx_power - 10 * n * np.log10(distance)
+        return rssi
+
+    def compute_dist(self, beacons, rssi_values):
+        distances = self.rssi_to_distance(rssi_values)
+        coords_and_dists = []
+        for i, beacon in enumerate(beacons):
+            coords_and_dists.append((beacon[0], beacon[1], distances[i]))
+        return coords_and_dists
+
+    def triposition(self, beacons, rssi_values):
+        coords_and_dists = self.compute_dist(beacons, rssi_values)
+        (xa, ya, da), (xb, yb, db), (xc, yc, dc) = coords_and_dists[:3]
+        x, y = sp.symbols('x y')
+        f1 = 2*x*(xa-xc) + xc**2 - xa**2 + 2*y*(ya-yc) + yc**2 - ya**2 - (dc**2 - da**2)
+        f2 = 2*x*(xb-xc) + xc**2 - xb**2 + 2*y*(yb-yc) + yc**2 - yb**2 - (dc**2 - db**2)
+        result = sp.solve([f1, f2], (x, y))
+        locx, locy = result[x], result[y]
+        return [float(locx), float(locy)]
+
+def detect_location(rssi_values, beacons, mode="pf"):
+    if mode == "pf":
+        # Get the indices of the two-largest RSSI values
+        largest_indices = np.argsort(rssi_values)[-2:]
+        largest_beacons = [beacons[i] for i in largest_indices]
+        largest_rssi_values = [rssi_values[i] for i in largest_indices]
+
+        # Create and configure the particle filter
+        pf = ParticleFilter()
+        pf.set_beacons(largest_beacons)
+
+        # Run the particle filter
+        estimated_location = pf.run(largest_rssi_values)
+    elif mode == "tri":
+        # Use triangulation to locate the device
+        tri = Triangulation()
+        estimated_location = tri.triposition(beacons, rssi_values)
+    else:
+        raise ValueError("Unsupported mode. Use 'pf' for particle filter or 'tri' for triangulation.")
+
+    return estimated_location
+
+def clip_location(loc):
+    y_min, y_max = 0, 0
+    if loc[0] < 0:
+        x = 0
+    elif loc[0] > 0 and loc[0] < 14.0:
+        y_max = 2.67 
+        x = loc[0]
+    elif loc[0] > 14.0 and loc[0] < 18.1:
+        y_max = 3.9
+        x = loc[0]
+    elif loc[0] > 18.1:
+        x = 18.1
+    
+    if loc[1] < y_min:
+        y = y_min
+    elif loc[1] > y_max:
+        y = y_max
+    else:
+        y = loc[1]
+    
+    return [x,y]
+
+def scenario2(json_list, mode="tri"):
+    # Set beacons' location 
+    beacons = np.array([[0,0], [2.6,2.67], [5.71,2.67], [9.7,2.67], [13.5,2.67], [15.1,0], [17.5,0], [16.9,3.9]])
+    # Compute average rssi value 
+    rssi_values = get_input(json_list)
+    # Compute location by pf/tri algorithm
+    location = detect_location(rssi_values, beacons, mode)
+    DEBUG_FLAG = 1
+    if DEBUG_FLAG:
+        print(f"rssi_lst: {rssi_values}, location: {location}")
+    location = clip_location(location)
+    return f"x: {location[0]:.2f}m, y: {location[1]:.2f}m"
+
+
+def check_minors(json_list):
     result = []
-    for minor_key in range(1, 5):  # Check only for minors 1 to 4
+    minor_flag_num=0
+    for minor_key in range(1, 9):  # Check only for minors 1 to 8
         minor_list = json_list.get(minor_key, [])
         if len(minor_list) != 10:
-            return None
-        if len(minor_list) == 10:
-            # Calculate average RSSI
-            average_rssi = sum(item['RSSI'] for item in minor_list) / len(minor_list)
-            # Construct new JSON entry with averaged RSSI
-            result.append({
-                'Minor': minor_key,
-                'RSSI': average_rssi,
-            })
-    return result
+            continue
+        else:
+            minor_flag_num+=1
+            if minor_flag_num>=3:
+                return True
+    return None
+        # if len(minor_list) == 10:
+        #     # Calculate average RSSI
+        #     average_rssi = sum(item['RSSI'] for item in minor_list) / len(minor_list)
+        #     # Construct new JSON entry with averaged RSSI
+        #     result.append({
+        #         'Minor': minor_key,
+        #         'RSSI': average_rssi,
+        #     })
+    # return result
+
+
 
 def preprocess_msg_to_json(msg):
     encapsulated_json_string = f"[{msg}]"
-    print(encapsulated_json_string)
+    # print(encapsulated_json_string)
 
     # Attempt to parse the newly structured JSON
     try:
@@ -52,6 +419,8 @@ def add_to_category_with_discard(data_json):
         print("data_json is None")
         return
     for item in data_json:
+        if item["Major"]==1:
+            continue
         minor_key = item["Minor"]
         if item["RSSI"]==0:
             continue
@@ -59,141 +428,9 @@ def add_to_category_with_discard(data_json):
             # Add the new item
             json_list[minor_key].append(item)
             # Ensure the list does not exceed 10 items, discarding the oldest if it does
-            if len(json_list[minor_key]) > 10:
+            if len(json_list[minor_key]) > json_list_length_limit:
                 json_list[minor_key].pop(0)
     
-def call_by_Ipad(json_list):
-    # difine region
-    outline_region =[0, 0, 4.3, 11.75]
-    A_region = [0, 7.21, 4.3, 11.75]
-    B_region = [0, 2.67, 4.3, 7.21]
-    C_region = [0, 0, 4.3, 2.67]
-
-    # get x, y
-    x_total = 0
-    y_total = 0
-    Rssi_1 = json_list[1]
-    Rssi_2 = json_list[2]
-    Rssi_3 = json_list[3]
-    Rssi_4 = json_list[4]
-    for i in range(10):
-        Rssi_list = {Rssi_1[i], Rssi_2[i], Rssi_3[i], Rssi_4[i]}
-        x, y = Indoor_Localization_for_iBeacon_Using_Propergation_Model(Rssi_list)
-        x_total += x
-        y_total += y
-
-    x_final = x_total / 10
-    y_final = y_total / 10
-
-
-    # determine the location in which region 
-    if x_final >= outline_region[0] and x_final <= outline_region[2] and y_final >= outline_region[1] and y_final <= outline_region[3]:
-        if x_final >= A_region[0] and x_final <= A_region[2] and y_final >= A_region[1] and y_final <= A_region[3]:
-            return "A"
-        elif x_final >= B_region[0] and x_final <= B_region[2] and y_final >= B_region[1] and y_final <= B_region[3]:
-            return "B"
-        elif x_final >= C_region[0] and x_final <= C_region[2] and y_final >= C_region[1] and y_final <= C_region[3]:
-            return "C"
-        else:
-            return "outside the region"
-    else:
-        return "outside the region"
-
-
-
-
-def Indoor_Localization_for_iBeacon_Using_Propergation_Model(Rssi_list, TxPower=-59, n=2.0):
-    # RSSI = RSSI value
-    # TxPower = RSSI value at 1 meter
-    # n = signal propagation exponent
-    
-    # define the input RSSI value
-    for i in Rssi_list:
-        if i["Minor"] == 1:
-            Rssi1 = i["RSSI"]
-        elif i["Minor"] == 2:
-            Rssi2 = i["RSSI"]
-        elif i["Minor"] == 3:
-            Rssi3 = i["RSSI"]
-        elif i["Minor"] == 4:
-            Rssi4 = i["RSSI"]
-    my_Rssi_List  = [[Rssi1,1], [Rssi2,2], [Rssi3,3], [Rssi4,4]]
-
-    # define the region 
-    '''
-    outline_region =[0, 0, 4.3, 11.75]
-    A_region = [0, 7.21, 4.3, 11.75]
-    B_region = [0, 2.67, 4.3, 7.21]
-    C_region = [0, 0, 4.3, 2.67]
-    '''
-
-    # define the ibeacon location
-    iBeacon_list = [[2.21, 0], [4.3, 5.7], [4.3, 7.8], [2.64, 11.75]]
-    # iBeacon_1 = [2.21, 0]
-    # iBeacon_2 = [4.3, 5.7]
-    # iBeacon_3 = [4.3, 7.8]
-    # iBeacon_4 = [2.64, 11.75]
-
-    # define the distance between the ibeacon
-    d = np.zeros((4, 4))
-    d[0][1] = d[1][0] = np.sqrt((iBeacon_list[0][0] - iBeacon_list[1][0]) ** 2 + (iBeacon_list[0][1] - iBeacon_list[1][1]) ** 2)
-    d[0][2] = d[2][0] = np.sqrt((iBeacon_list[0][0] - iBeacon_list[2][0]) ** 2 + (iBeacon_list[0][1] - iBeacon_list[2][1]) ** 2)
-    d[0][3] = d[3][0] = np.sqrt((iBeacon_list[0][0] - iBeacon_list[3][0]) ** 2 + (iBeacon_list[0][1] - iBeacon_list[3][1]) ** 2)
-    d[1][2] = d[2][1] = np.sqrt((iBeacon_list[1][0] - iBeacon_list[2][0]) ** 2 + (iBeacon_list[1][1] - iBeacon_list[2][1]) ** 2)
-    d[1][3] = d[3][1] = np.sqrt((iBeacon_list[1][0] - iBeacon_list[3][0]) ** 2 + (iBeacon_list[1][1] - iBeacon_list[3][1]) ** 2)
-    d[2][3] = d[3][2] = np.sqrt((iBeacon_list[2][0] - iBeacon_list[3][0]) ** 2 + (iBeacon_list[2][1] - iBeacon_list[3][1]) ** 2)
-    
-
-
-    # calculate the distance
-    distance_list = []
-    for rssi in my_Rssi_List:
-        distance = 10 ** ((abs(rssi[0]) - TxPower) / (10 * n))
-        distance_list.append(distance)
-
-    # distance1 = 10 ** ((abs(Rssi1) - TxPower) / (10 * n))
-    # distance2 = 10 ** ((abs(Rssi2) - TxPower) / (10 * n))
-    # distance3 = 10 ** ((abs(Rssi3) - TxPower) / (10 * n))
-    # distance4 = 10 ** ((abs(Rssi4) - TxPower) / (10 * n))
-
-    # print("distance1 = {:.2f} || distance2 = {:.2f} || distance3 = {:.2f} || distance4 = {:.2f}".format(distance1, distance2, distance3, distance4))
-    
-    #****************************************************************************************************************************************************#
-
-
-    # 三角定位演算法，把rssi最小的拔掉，剩下三個做三角定位
-    index_min = 5
-    min_Rssi = 0
-    for i in range(my_Rssi_List) :
-        if my_Rssi_List[i] < min_Rssi:
-            min_Rssi = my_Rssi_List[i]
-            index_min = i
-    
-    
-    
-    answer_coordinate = []
-    # check the circles are overlapped or not
-    for i in range(4):
-        for j in range(i,4):
-            if(i != j and i != index_min and j != index_min):
-                x_c, y_c, x_d, y_d = calculate_the_two_point_coordinate_of_circle(iBeacon_list[i][0], iBeacon_list[i][1], distance_list[i], iBeacon_list[j][0], iBeacon_list[j][1], distance_list[j], d[i][j])               
-                for k in range(4):
-                    if(k != i and k != j and k != index_min):
-                        if(abs(np.sqrt((x_c - iBeacon_list[k][0]) ** 2 + (y_c - iBeacon_list[k][1]) ** 2) - distance_list[k]) < 
-                           abs(np.sqrt((x_d - iBeacon_list[k][0]) ** 2 + (y_d - iBeacon_list[k][1]) ** 2) - distance_list[k])):
-                            answer_coordinate.append([x_c, y_c])
-                        else : 
-                            answer_coordinate.append([x_d, y_d, k])
-                           
-    # 找中心點
-    x_sum = 0
-    y_sum = 0
-    for i in answer_coordinate:
-        x_sum += i[0]
-        y_sum += i[1]
-    x_final = x_sum / len(answer_coordinate)
-    y_final = y_sum / len(answer_coordinate)
-    return x_final, y_final
 
 
 
@@ -262,20 +499,28 @@ class multi_sock(threading.Thread):
                 add_to_category_with_discard(data_json)
                 # print("recv: ",msg)
                 for minor_key, records in json_list.items():
-                    print(f"Minor {minor_key}:")
-                    for record in records:
-                        print(record)
+                    print(f"Minor {minor_key} queue len={len(records)}")
+                    # for record in records:
+                    #     print(record)
                     print()  # Add a newline for better separation between minors
-                input_json_list=check_and_average_minors(json_list)
-                if input_json_list!=None:
-                    answer=Indoor_Localization_for_iBeacon_Using_Propergation_Model(Rssi_list=input_json_list)
+                minors_flag=check_minors(json_list)
+                current_time=time.time()-start_time
+                if minors_flag!=None:
+                    print("start to compute position")
+                    answer=scenario2(json_list=json_list, mode="pf")
                     send_back_msg=f"{answer}"
                     send_back_msg=send_back_msg.encode(self.code)
                     self.conn.send(send_back_msg)
-                
                 else:
                     #check and return 
                     send_back_msg=f"wait"
+                    send_back_msg=send_back_msg.encode(self.code)
+                    self.conn.send(send_back_msg)
+                if current_time>=time_limit:
+                    filled_json_list=fill_json_list(json_list)
+                    print(f"timeout ({time_limit}s) \nstart to compute position")
+                    answer=scenario2(json_list=filled_json_list, mode="pf")
+                    send_back_msg=f"{answer}"
                     send_back_msg=send_back_msg.encode(self.code)
                     self.conn.send(send_back_msg)
                 

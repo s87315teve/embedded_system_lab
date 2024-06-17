@@ -9,29 +9,63 @@ import traceback
 import argparse
 import json
 import numpy as np
+import copy
 
 json_list = {i: [] for i in range(1, 9)}
+json_list_length_limit=10
+time_limit=20
+start_time=time.time()
 
 
-def check_and_average_minors(json_list):
+
+def check_minors(json_list):
     result = []
     for minor_key in range(1, 5):  # Check only for minors 1 to 4
         minor_list = json_list.get(minor_key, [])
-        if len(minor_list) != 10:
+        if len(minor_list) < json_list_length_limit:
             return None
-        if len(minor_list) == 10:
-            # Calculate average RSSI
-            average_rssi = sum(item['RSSI'] for item in minor_list) / len(minor_list)
-            # Construct new JSON entry with averaged RSSI
-            result.append({
-                'Minor': minor_key,
-                'RSSI': average_rssi,
-            })
-    return result
+    return True
+        # if len(minor_list) == 10:
+        #     # Calculate average RSSI
+        #     average_rssi = sum(item['RSSI'] for item in minor_list) / len(minor_list)
+        #     # Construct new JSON entry with averaged RSSI
+        #     result.append({
+        #         'Minor': minor_key,
+        #         'RSSI': average_rssi,
+        #     })
+    # return result
+def special_case_answer(json_list):
+    len1=len(json_list[1])
+    len2=len(json_list[2])
+    len3=len(json_list[3])
+    len4=len(json_list[4])
+    if len1>len4+5 and len1>len2+3 and len1 > len3+3:
+        return "C"
+    if len4>len1+5 and len4>len2+3 and len4 > len3+3:
+        return "A"
+    
+    return None
+
+def fill_json_list(json_list, limit_length=json_list_length_limit):
+    json_list_copy = copy.deepcopy(json_list)
+    for key, items in json_list_copy.items():
+        if len(items) < limit_length:
+            # Calculate the average RSSI value from existing items
+            if items:  # Check if there are any existing items to calculate the average
+                average_rssi = sum(item['RSSI'] for item in items) / len(items)
+            else:
+                average_rssi = -1000  # Set RSSI to -200 if no initial values
+            
+            # Add additional items to fill the list to 10 items
+            while len(items) < limit_length:
+                items.append({'Major': 1, 'Minor': key, 'RSSI': average_rssi})
+
+    return json_list_copy
+
 
 def preprocess_msg_to_json(msg):
     encapsulated_json_string = f"[{msg}]"
-    print(encapsulated_json_string)
+    # print(encapsulated_json_string)
 
     # Attempt to parse the newly structured JSON
     try:
@@ -52,6 +86,8 @@ def add_to_category_with_discard(data_json):
         print("data_json is None")
         return
     for item in data_json:
+        if item["Major"]==2:
+            continue
         minor_key = item["Minor"]
         if item["RSSI"]==0:
             continue
@@ -59,7 +95,7 @@ def add_to_category_with_discard(data_json):
             # Add the new item
             json_list[minor_key].append(item)
             # Ensure the list does not exceed 10 items, discarding the oldest if it does
-            if len(json_list[minor_key]) > 10:
+            if len(json_list[minor_key]) > json_list_length_limit:
                 json_list[minor_key].pop(0)
     
 def call_by_Ipad(json_list):
@@ -76,14 +112,24 @@ def call_by_Ipad(json_list):
     Rssi_2 = json_list[2]
     Rssi_3 = json_list[3]
     Rssi_4 = json_list[4]
-    for i in range(10):
-        Rssi_list = {Rssi_1[i], Rssi_2[i], Rssi_3[i], Rssi_4[i]}
+    
+    if(np.mean([item["RSSI"] for item in Rssi_1 ]) > np.mean([item["RSSI"] for item in Rssi_2 ]) and np.mean([item["RSSI"] for item in Rssi_1 ]) > np.mean([item["RSSI"] for item in Rssi_3 ]) and np.mean([item["RSSI"] for item in Rssi_1 ]) > np.mean([item["RSSI"] for item in Rssi_4 ])):
+        return "C"
+    if(np.mean([item["RSSI"] for item in Rssi_4 ]) > np.mean([item["RSSI"] for item in Rssi_1 ]) and np.mean([item["RSSI"] for item in Rssi_3 ]) > np.mean([item["RSSI"] for item in Rssi_1 ])):
+        return "A"
+
+
+    for i in range(len(Rssi_1)):
+        Rssi_list = [Rssi_1[i], Rssi_2[i], Rssi_3[i], Rssi_4[i]]
         x, y = Indoor_Localization_for_iBeacon_Using_Propergation_Model(Rssi_list)
+        print(f"x{i}:{x:.2f}, y{i}:{y:.2f}")
+        
         x_total += x
         y_total += y
 
-    x_final = x_total / 10
-    y_final = y_total / 10
+    x_final = x_total / len(Rssi_1)
+    y_final = y_total / len(Rssi_1)
+    print(f"avg x:{x_final:.2f}, y:{y_final:.2f}")
 
 
     # determine the location in which region 
@@ -94,10 +140,15 @@ def call_by_Ipad(json_list):
             return "B"
         elif x_final >= C_region[0] and x_final <= C_region[2] and y_final >= C_region[1] and y_final <= C_region[3]:
             return "C"
-        else:
-            return "outside the region"
     else:
-        return "outside the region"
+        if y_final > 7.21:
+            return "A"
+        elif y_final < 0:
+            return "C"
+        else:
+            return "B"
+        # return "outside the region"
+
 
 
 
@@ -148,7 +199,9 @@ def Indoor_Localization_for_iBeacon_Using_Propergation_Model(Rssi_list, TxPower=
     # calculate the distance
     distance_list = []
     for rssi in my_Rssi_List:
-        distance = 10 ** ((abs(rssi[0]) - TxPower) / (10 * n))
+        # print(rssi[0], TxPower, n)
+        distance = 10 ** ((TxPower - rssi[0]) / (10 * n))
+        # print(distance)
         distance_list.append(distance)
 
     # distance1 = 10 ** ((abs(Rssi1) - TxPower) / (10 * n))
@@ -164,9 +217,9 @@ def Indoor_Localization_for_iBeacon_Using_Propergation_Model(Rssi_list, TxPower=
     # 三角定位演算法，把rssi最小的拔掉，剩下三個做三角定位
     index_min = 5
     min_Rssi = 0
-    for i in range(my_Rssi_List) :
-        if my_Rssi_List[i] < min_Rssi:
-            min_Rssi = my_Rssi_List[i]
+    for i in range(len(my_Rssi_List)) :
+        if my_Rssi_List[i][0] < min_Rssi:
+            min_Rssi = my_Rssi_List[i][0]
             index_min = i
     
     
@@ -183,7 +236,7 @@ def Indoor_Localization_for_iBeacon_Using_Propergation_Model(Rssi_list, TxPower=
                            abs(np.sqrt((x_d - iBeacon_list[k][0]) ** 2 + (y_d - iBeacon_list[k][1]) ** 2) - distance_list[k])):
                             answer_coordinate.append([x_c, y_c])
                         else : 
-                            answer_coordinate.append([x_d, y_d, k])
+                            answer_coordinate.append([x_d, y_d])
                            
     # 找中心點
     x_sum = 0
@@ -196,14 +249,13 @@ def Indoor_Localization_for_iBeacon_Using_Propergation_Model(Rssi_list, TxPower=
     return x_final, y_final
 
 
-
 def calculate_the_two_point_coordinate_of_circle(x_a, y_a, r_a, x_b, y_b, r_b, d_ab):
     # for point C and D
     # caculate d_ae : the distance between point A and E
     d_ae = (r_a ** 2 - r_b ** 2 + d_ab ** 2) / (2 * d_ab)
 
     # calculate d_ce : the distance between point C and E
-    d_ce = np.sqrt(r_a ** 2 - d_ae ** 2)
+    d_ce = np.sqrt(abs(r_a ** 2 - d_ae ** 2))
 
     # calculate the coordinate of point E
     x_e = x_a + d_ae * (x_b - x_a) / d_ab
@@ -211,7 +263,7 @@ def calculate_the_two_point_coordinate_of_circle(x_a, y_a, r_a, x_b, y_b, r_b, d
 
     # calculate the slope of the line AB
     if(x_a == x_b):
-        k_ab = 0
+        k_ab = 1e-14
     else:
         k_ab = (y_b - y_a) / (x_b - x_a)
 
@@ -262,25 +314,43 @@ class multi_sock(threading.Thread):
                 add_to_category_with_discard(data_json)
                 # print("recv: ",msg)
                 for minor_key, records in json_list.items():
-                    print(f"Minor {minor_key}:")
-                    for record in records:
-                        print(record)
+                    print(f"Minor {minor_key} queue len={len(records)}")
+                    # for record in records:
+                    #     print(record)
                     print()  # Add a newline for better separation between minors
-                input_json_list=check_and_average_minors(json_list)
-                if input_json_list!=None:
-                    answer=Indoor_Localization_for_iBeacon_Using_Propergation_Model(Rssi_list=input_json_list)
+                minors_flag=check_minors(json_list)
+                current_time=time.time()-start_time
+                if minors_flag!=None:
+                    answer=call_by_Ipad(json_list=json_list)
                     send_back_msg=f"{answer}"
                     send_back_msg=send_back_msg.encode(self.code)
                     self.conn.send(send_back_msg)
-                
                 else:
-                    #check and return 
-                    send_back_msg=f"wait"
-                    send_back_msg=send_back_msg.encode(self.code)
-                    self.conn.send(send_back_msg)
-                
-                
+                    if current_time<time_limit:
+                        #check and return 
+                        send_back_msg=f"wait"
+                        send_back_msg=send_back_msg.encode(self.code)
+                        self.conn.send(send_back_msg)
+                    else:
+                        print(f"timeout ({time_limit}s) \nstart to compute position")
+                        special_answer=special_case_answer(json_list)
+                        if special_answer!=None:
+                            send_back_msg=f"{special_answer}"
+                            send_back_msg=send_back_msg.encode(self.code)
+                            self.conn.send(send_back_msg)
+                            print(f"special_answer: {send_back_msg}" )
+                            continue
+                        if current_time>=time_limit:
+                            filled_json_list=fill_json_list(json_list)
+                            print(f"Filled json list:\n{filled_json_list}")
+                            answer=call_by_Ipad(json_list=filled_json_list)
+                            print(f"Answer: {answer}")
+                            send_back_msg=f"{answer}"
+                            send_back_msg=send_back_msg.encode(self.code)
+                            self.conn.send(send_back_msg)
+                            continue
 
+                            
             except socket.timeout:
                 print("{} socket timeout".format(self.addr))
                 print("connection closed")

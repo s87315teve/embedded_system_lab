@@ -13,7 +13,7 @@
 
 #define BEACON_UUID @"A3E1C063-9235-4B25-AA84-D249950AADC4"
 #define BEACON_MAJOR 0x0001
-#define BEACON_MINOR 0x0001
+#define BEACON_MINOR 0x0004
 
 
 @interface AppDelegate () <CBPeripheralManagerDelegate> {

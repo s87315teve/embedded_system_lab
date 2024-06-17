@@ -1,0 +1,1 @@
+python integration_scenario1.py --mode TCP_server --host 172.20.10.2 --port 6000
